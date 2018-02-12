@@ -25,16 +25,36 @@ var server = app.listen(8000, function() {
 
 var io = require('socket.io').listen(server);
 
+var all_users = [];
+var all_messages = [];
+
+function remove(array, element) {
+    const index = array.indexOf(element);
+    array.splice(index, 1);
+}
 
 io.sockets.on('connection', function (socket) {
+    updated_data = {
+        all_users : all_users,
+        all_messages:all_messages
+    }
+    io.emit( 'server_response_refresh_user', updated_data);
+    console.log("first all users =" + all_users)
     socket.on( "got_a_new_user", function (data){
-        socket.emit( 'server_response', data);
-        console.log(data)
+        all_users.push(data.name);
+        all_messages.push(data.message);
+        updated_data = {
+            all_users : all_users,
+            all_messages:all_messages
+        }
+        console.log("second all users=" + all_users)
+        io.emit( 'server_response_refresh_user', updated_data);
+        console.log("updated data = " + updated_data.all_users + " " + updated_data.all_messages)
     })
-    socket.on( "reset_button_clicked", function (count){
-        count = parseInt(count);
-        count = 0
-        socket.emit( 'server_response_reset', count);
-    })
-    
-  })
+
+    // socket.on("user_left",function (data){
+    //     remove(all_users, data);
+    //     console.log("updated users" + all_users)
+    //     io.emit( 'server_response_refresh_user', all_users);
+    // })
+})

@@ -4,31 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Epic Button Game</title>
+    <title>Chatroom</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type ="text/javascript">
          $(document).ready(function(){
             let socket = io.connect()
             var name = prompt("What is your name?")
-            socket.emit("got_a_new_user", name);
 
-            socket.on( 'server_response', function (count){
-                document.getElementById("number").innerHTML = count;
+            $("#submit").click(function(){
+                var result = {
+                    name : name,
+                    message : $('#input').val(),
+                };
+                socket.emit("got_a_new_user", result);
+                return false
+            })
+
+            socket.on( 'server_response_refresh_user', function (updated_data){
+                console.log("clientside data " + updated_data.all_users)
+                $('#message_board').empty();
+                console.log("user list length: " + updated_data.all_users.length);
+                for (var i =0; i < updated_data.all_users.length; i++){
+                    console.log(i)
+                    $('#message_board').append('<div>' + updated_data.all_users[i]+ ": " + updated_data.all_messages[i] + '</div>');
+                }
             });
 
-            
-            // $("#reset").click(function() {
-            //     var count = $('#number').text();
-            //     socket.emit("reset_button_clicked", count);
-            // });
-            // socket.on( 'server_response_reset', function (count){
-            //     document.getElementById("number").innerHTML = count;
-            // });
+            $("#disconnect").click(function() {
+                socket.emit("user_left", name);
+                console.log("disconnect" + name)
+            });
         })
     </script>
 </head>
 <body>
-    
+    <div id="wrapper">
+        <h2>Conversation Board</h2>
+        <div id="message_board">
+
+        </div>
+        <form id="" action="#">
+            <input id="input" type="text" name="input">
+            <br>
+            <input id="submit" type="submit" value="Submit">
+        </form>
+        <button id="disconnect">Disconnect</button>
+    </div>
 </body>
 </html> 

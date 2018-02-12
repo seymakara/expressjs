@@ -1,0 +1,66 @@
+<html>
+<head>
+<title>Using Sockets</title>
+    <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+         $(document). ready(function (){
+            let socket = io.connect()
+            $("#infoForm").submit(function() {
+                var result = {
+                    name : $('#formName').val(),
+                    location: $('#location').val(),
+                    language: $('#language').val(),
+                    comment: $('#comment').val()
+                };
+                socket.emit("submit_form", result);
+                return false
+            });
+            socket.on( 'server_response', function (data){
+                document.getElementById("passedInfo").innerHTML = `name: ${data.name}, location: ${data.location}, language: ${data.language}, comment: ${data.comment}`;
+                document.getElementById("luckyNumber").innerHTML = `Your lucky number emitted by the server is ${data.number}.`
+            });
+        })
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="infoCard">
+            <fieldset>
+                <p id="passedInfo"></p>
+                <p id="luckyNumber"></p>
+            </fieldset>
+        </div>
+        <div>
+            <form id="infoForm">
+                <label for="YourName">Your Name:</label>
+                <input id="formName" type="text" name ="name"><br>
+                <label for="location">Dojo Location:</label>
+                <select id="location" name="location">
+                    <option value ="Seattle"> Seattle</option>
+                    <option value ="Los Angeles"> Los Angeles</option>
+                    <option value ="Silicon Valley"> Silicon Valley</option>
+                    <option value ="Washington DC"> Washington DC</option>
+                    <option value ="Dallas"> Dallas</option>
+                    <option value ="Chicago"> Chicago</option>
+                    <option value ="Tulsa"> Tulsa</option>
+                    <option value ="Online"> Online</option>
+                </select><br>
+                <label for="language">Favorite Language: </label> 
+                <select id="language" name="language">
+                    <option value ="Python"> Python</option>
+                    <option value ="Ruby on Rails"> Ruby on Rails</option>
+                    <option value ="C#"> C#</option>
+                    <option value ="Mean"> Mean</option>
+                    <option value ="Java"> Java</option>
+                    <option value ="iOS"> iOS Swift</option>
+                </select><br>
+                <label for="comment">Comment (optional): </label><br><br>
+                <textarea id="comment" name="comment" cols="30" rows="6"></textarea></p><br>
+                <input id="formInput" class=submit type="submit" value="Submit Your Survey"><br>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
